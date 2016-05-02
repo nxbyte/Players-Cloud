@@ -1,0 +1,6 @@
+{
+    "name": "ytn-cloud",
+    "description": "A backend for accessing data from the red and white play button",
+    "repository": "https://github.com/nextseto/ytn-cloud/source",
+    "keywords": ["ytn", "players", "nodejs"]
+}
