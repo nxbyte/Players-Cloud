@@ -22,7 +22,7 @@ node CORE.js
 
 ## Note
 
-This branch of ytn-cloud (v1.1) will work with v1.1 of the Players (v1.1) iOS application. **There is no guarantees that future front ends will be backwards compatiable with this backend version.**
+This branch of ytn-cloud (v1.1) will work with v1.1 of the Players (v1.1) iOS application. **There are no guarantees that future front ends will be backwards compatiable with this version of the backend.**
 
 ## License
 
