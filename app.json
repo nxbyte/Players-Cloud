@@ -6,7 +6,7 @@
     "env": {
         "YOUTUBE_API_KEY": {
             "description": "A secret key for accessing the Youtube API",
-            "required": "true"
+            "required": true
         }
     }
 }
