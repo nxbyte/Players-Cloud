@@ -23,7 +23,11 @@ var async = require('async')
 var TimSort = require('timsort');
 
 /* Google Youtube API Key. Recommended: Register with Google for a unique key */
-const APIKEY = "INSERT API KEY HERE" 
+const APIKEY = process.env.YOUTUBE_API_KEY
+
+if (!APIKEY) {
+    throw new Error('CRASH PROBLEM: NO YOUTUBE API KEY SET process.env.YOUTUBE_API_KEY')
+}
 
 /* Setup Youtube Internal Engine */
 var ytdl = require('ytdl-core')
