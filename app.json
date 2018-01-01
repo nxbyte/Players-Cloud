@@ -1,8 +1,8 @@
 {
-    "name": "ytn-cloud",
-    "description": "A backend for accessing data from the red and white play button",
-    "repository": "https://github.com/nextseto/ytn-cloud",
-    "keywords": ["ytn", "players", "nodejs", "youtube", "ios"],
+    "name": "Players-cloud",
+    "description": "An open source nodeJS backend that retrieves and parses Youtube data via Google's APIs",
+    "repository": "https://github.com/nextseto/Players-cloud",
+    "keywords": ["players", "nodejs", "youtube", "ios", "video"],
     "env": {
         "YOUTUBE_API_KEY": {
             "description": "A secret key for accessing the Youtube API",
