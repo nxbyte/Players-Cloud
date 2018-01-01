@@ -1,292 +1,370 @@
-//  Warren Seto
-//  CORE.js
-//  A backend for accessing data from the red and white play button
-
+// Warren Seto
 "use strict"
 
-/** Initializing libraries needed for running */
-
-/* Setup Server Rules */
-var server = require('express')()
+// Setup Server Rules
+const server = require('express')()
 server.use(require('compression')())
 server.set('view engine', 'ejs')
 server.set('views', __dirname + '/html')
 
-/* Setup HTTP client */
-var https = require('https')
+// Setup HTTP client
+const https = require('https')
 https.globalAgent.maxSockets = Infinity
 
-/* Setup Async */
-var async = require('async')
+// Setup Async
+const asyncEach = require('async/each'),
+      asyncParallel = require('async/parallel')
 
-/* Setup Sorting System */
-var TimSort = require('timsort');
+// Setup Faster Sorting
+const TimSort = require('timsort')
 
-/* Google Youtube API Key. Recommended: Register with Google for a unique key */
+// Youtube API Key
 const APIKEY = process.env.YOUTUBE_API_KEY
 
 if (!APIKEY) {
     throw new Error('CRASH PROBLEM: NO YOUTUBE API KEY SET process.env.YOUTUBE_API_KEY')
 }
 
-/* Setup Youtube Internal Engine */
-var ytdl = require('ytdl-core')
+// Setup Youtube Internal Engine
+const ytdl = require('ytdl-core')
 
-/** REST APIs */
 
-/* Returns a String of recent videos from an array of Channel IDs */
-server.get('/now', function(input, output)
+// Strings used for GoogleAPIs
+const VideoAPIQuery = 'https://www.googleapis.com/youtube/v3/videos?key=' + APIKEY + '&id=',
+      SearchAPIQuery = 'https://www.googleapis.com/youtube/v3/search?key=' + APIKEY + '&part=snippet&type=video&fields=items/snippet,items/id/videoId',
+      ChannelAPIQuery = 'https://www.googleapis.com/youtube/v3/channels?key=' + APIKEY + '&part=snippet&fields=items/snippet/description,items/snippet/customUrl,items/snippet/thumbnails/medium&id='
+
+
+/**
+ * @typedef {Object} VideoResult
+ * @property {String} title
+ * @property {String} thumbnail
+ * @property {String} videoid
+ * @property {String} channelname
+ * @property {String} channelid
+ * @property {String} duration
+ * @property {String} viewcount
+ */
+
+/**
+ * Returns 
+ * @params {String} ID
+ * @return {VideoResult[]}
+ */
+server.get('/channel/:ID', function(input, output)
 {
-    input = input.query
+    var feed = []
     
-    if (!input.c)
-        return output.sendStatus(404)
-
-    input = input.c.split(",")
-    let feed = []
-
-    async.each(input, function(e, cb)
+    asyncEach(input.params.ID.split(','), function(e, cb)
     {
-        download("https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=" + e + "&order=date&type=video&maxResults=15&key=" + APIKEY, function(data1) 
+        download(SearchAPIQuery + '&channelId=' + e + '&order=date&maxResults=15', function(data1) 
         {
+            data1 = JSON.parse(data1).items
+            
             if (data1)
             {
-                data1 = JSON.parse(data1).items
-                
-                let size = data1.length
+                var size = data1.length
                 while (size--)
                 {
                     feed.push
                     ({    
-                           "time":data1[size].snippet.publishedAt,
-                          "title":data1[size].snippet.title, 
-                      "thumbnail":data1[size].snippet.thumbnails.medium.url, 
-                        "videoID":data1[size].id.videoId,
-                    "channelName":data1[size].snippet.channelTitle, 
-                      "channelId":data1[size].snippet.channelId
+                           time: data1[size].snippet.publishedAt,
+                          title: data1[size].snippet.title, 
+                      thumbnail: data1[size].snippet.thumbnails.medium.url, 
+                        videoid: data1[size].id.videoId,
+                    channelname: data1[size].snippet.channelTitle, 
+                      channelid: data1[size].snippet.channelId
                     })
                 }
             }
-                cb()
+            
+            cb()
         })
     }, 
     function(r)
     {
         TimSort.sort(feed, nowSort)
         
-        let size = feed.length
-                
+        var size = feed.length
+
         if (size > 30)
-            size = 30
-                
-        feed = feed.slice(-1 * size)
-                
-        size--
-                
-        let vids = feed[size].videoID  
-        while (size--) { vids += "," + feed[size].videoID }
+            size = 30   
+            
+        feed = feed.slice(0, size)
         
-        download("https://www.googleapis.com/youtube/v3/videos?id=" + vids + "&key=" + APIKEY + "&part=contentDetails,statistics", function(data2)
+        size--
+        var vids = feed[size].videoid  
+ 
+        while (size--)
+            vids += ',' + feed[size].videoid                  
+
+        download(VideoAPIQuery + vids + '&part=contentDetails,statistics&fields=items/contentDetails/duration,items/statistics/viewCount', function(data2)
         { 
             data2 = JSON.parse(data2).items
 
-            vids = ""
-            
-            let repeat = 0
+            var repeat = 0
             size = data2.length 
             while (size--)   
             { 
-                vids  +=            feed[size].title
-                      + "///:///" + feed[size].thumbnail 
-                      + "///:///" + parseDuration(data2[repeat].contentDetails.duration) 
-                      + "///:///" + numberWithCommas(data2[repeat].statistics.viewCount)
-                      + "///:///https://www.youtube.com/watch?v=" + feed[size].videoID 
-                      + "///:///" + feed[size].channelName 
-                      + "///:///" + feed[size].channelId
-                      + "///:///"
-                       
+                feed[size].duration = parseDuration(data2[repeat].contentDetails.duration)
+                feed[size].viewcount = data2[repeat].statistics.viewCount ? numberWithCommas(data2[repeat].statistics.viewCount) : 0
+                delete feed[size].time
                 repeat++
             }
-                return output.send(vids)
+                return output.send(feed)
         })
     })
 })
 
-/* Returns a string with the url of the video's MP4 */
-server.get('/video', function(input, output)
+
+
+/**
+ * @typedef {Object} VideoDetail
+ * @property {String} description
+ * @property {String} mp4
+ */
+
+/**
+ * Returns 
+ * @params {String} ID
+ * @params {String} format
+ * @return {VideoDetail}
+ */
+server.get('/video/detail/:ID/:format', function(input, output)
 {
-    input = input.query
-    
-    if (!input.q || !input.u)
-        return output.sendStatus(404)
-   
-    ytdl.getInfo(input.u, {downloadURL: true}, function(err, data) 
-    {    
-        if (!err)
-        {
-            data = data.formats
-            const size = data.length
-            
-            if (input.q === '720p')
-                for (let count = 0; count < size; count++)
-                    if (data[count].itag === '22')
-                        return output.send(data[count].url)  
+    asyncParallel({
+        mp4 : function(cb) {
+           ytdl.getInfo(input.params.ID, {downloadURL: true}, function(err, data) 
+            {    
+                if (!err) {
+                    data = data.formats
+                    const size = data.length
 
-            for (let count = 0; count < size; count++)
-                if (data[count].itag === '18')
-                    return output.send(data[count].url)  
+                    if (input.params.format === 'hd')
+                        for (var count = 0; count < size; count++)
+                            if (data[count].itag === '22')
+                                cb(null, data[count].url)  
+
+                    for (var count = 0; count < size; count++)
+                        if (data[count].itag === '18')
+                            cb(null, data[count].url)  
+                }
+
+                else
+                    cb(null, "")
+            })
+        },
+        parts : function(cb) {
+
+            download(VideoAPIQuery + input.params.ID + '&part=snippet,statistics&fields=items/snippet/description,items/statistics/likeCount,items/statistics/dislikeCount', function(data1) {
+                
+                data1 = JSON.parse(data1).items[0]
+
+                cb(null, {
+                    mp4: "", 
+                    description: data1.snippet.description, 
+                    like: data1.statistics && data1.statistics.likeCount ? numberWithCommas(data1.statistics.likeCount) : "-",
+                    dislike: data1.statistics && data1.statistics.dislikeCount ? numberWithCommas(data1.statistics.dislikeCount) : "-"
+                })
+            })
         }
-
-        else
-            return output.sendStatus(500)
+    },
+    function(err, outputData) 
+    {
+        outputData.parts.mp4 = outputData.mp4
+        
+        return output.send(outputData.parts)
     })
 })
 
-/* Returns a String of videos from a query */
-server.get('/search', function(input, output)
-{
-    input = input.query
-    if (!input.i || !input.s) 
-        return output.sendStatus(404)
-    
-    input.i = parseInt(input.i) + 25
 
-    download("https://www.googleapis.com/youtube/v3/search?part=snippet&q=" + input.s + "&maxResults=" + input.i + "&type=video&key=" + APIKEY, function(data1) 
+
+/**
+ * @typedef {Object} VideoEntry
+ * @property {VideoResult} result
+ * @property {VideoDetail} detail
+ */
+
+/**
+ * Returns 
+ * @params {String} ID
+ * @params {String} format
+ * @return {VideoEntry}
+ */
+server.get('/video/:ID/:format', function(input, output)
+{
+    asyncParallel({
+        mp4 : function(cb) {
+           ytdl.getInfo(input.params.ID, {downloadURL: true}, function(err, data) {    
+               
+               if (!err) {
+                    data = data.formats
+                    const size = data.length
+
+                    if (input.params.format === 'hd')
+                        for (var count = 0; count < size; count++)
+                            if (data[count].itag === '22')
+                                cb(null, data[count].url)  
+
+                    for (var count = 0; count < size; count++)
+                        if (data[count].itag === '18')
+                            cb(null, data[count].url)  
+                   
+               }
+                else
+                    return output.sendStatus(500)
+            })
+        },
+        parts : function(cb) {
+            download(VideoAPIQuery + input.params.ID + '&part=contentDetails,snippet,statistics&fields=items/snippet,items/contentDetails/duration,items/statistics/viewCount,items/statistics/likeCount,items/statistics/dislikeCount', function(data1) {
+                
+                data1 = JSON.parse(data1).items[0]
+
+                if (data1) {
+                    cb(null, {
+                        one: { 
+                            mp4: "",
+                            description: data1.snippet.description,
+                            like: data1.statistics && data1.statistics.likeCount ? numberWithCommas(data1.statistics.likeCount) : "-",
+                            dislike: data1.statistics && data1.statistics.dislikeCount ? numberWithCommas(data1.statistics.dislikeCount) : "-"
+                        },
+                        two: { title:data1.snippet.title, 
+                              thumbnail: data1.snippet.thumbnails.medium.url, 
+                              videoid:input.params.ID, 
+                              channelname:data1.snippet.channelTitle, 
+                              channelid:data1.snippet.channelId, 
+                              duration: parseDuration(data1.contentDetails.duration), 
+                              viewcount: data1.statistics.viewCount ? numberWithCommas(data1.statistics.viewCount) : "0"
+                             }
+                    })
+                } else {
+                    cb(null, {})
+                }
+            })
+        }
+    },
+    function (err, outputData) {
+        outputData.parts.one.mp4 = outputData.mp4
+        
+        return output.send({result: outputData.parts.two, detail: outputData.parts.one})
+    })
+})
+
+
+
+/**
+ * @typedef {Object} SearchResult
+ * @property {nextToken} results
+ * @property {VideoResult[]} nextToken
+ */
+
+/**
+ * Returns 
+ * @params {String} query
+ * @params {String} nextToken
+ * @params {String} options
+ * @return {SearchResult}
+ */
+server.get('/search/:query/:nextToken/:options', function(input, output)
+{
+    download(SearchAPIQuery + ',nextPageToken&q=' + input.params.query + '&maxResults=25' + (input.params.nextToken === ' ' ? '' : '&pageToken=' + input.params.nextToken) + (input.params.options === ' ' ? '' : '&' + input.params.options), function(data1) 
     {
         data1 = JSON.parse(data1)
+
+        if (!data1) {
+            return output.send([])
+        }
         
-        let size = data1.pageInfo.totalResults
-        if (size > 26) { size = 25 }
-        input.i = size
-        size--
+        var feed = '',
+            size = data1.items.length
         
-        data1 = data1.items.splice(-1 * input.i)
+        while (size--)
+            feed += ',' + data1.items[size].id.videoId
         
-        let feed = data1[size].id.videoId
-        while (size--) { feed += "," + data1[size].id.videoId }
-        
-        download("https://www.googleapis.com/youtube/v3/videos?id=" + feed + "&key=" + APIKEY + "&part=contentDetails,statistics", function(data2) 
+        download(VideoAPIQuery + feed + '&part=contentDetails,statistics&fields=items/contentDetails/duration,items/statistics/viewCount', function(data2) 
         {
-            var count = 0
-            
-            feed = ""
-            size = input.i
+            const outputJSON = {nextToken : data1.nextPageToken, results : []}
+            var repeat = 0
             
             data2 = JSON.parse(data2).items
+            size = data2.length
             
             while (size--)
             {
-               feed +=            data1[count].snippet.title 
-                    + "///:///" + data1[count].snippet.thumbnails.medium.url 
-                    + "///:///" + parseDuration(data2[size].contentDetails.duration) 
-                    + "///:///" + numberWithCommas(data2[size].statistics.viewCount)
-                    + "///:///https://www.youtube.com/watch?v=" + data1[count].id.videoId 
-                    + "///:///" + data1[count].snippet.channelTitle 
-                    + "///:///" + data1[count].snippet.channelId 
-                    + "///:///"
-               
-               count++
+                outputJSON.results.push
+                ({    
+                        title: data1.items[repeat].snippet.title, 
+                    thumbnail: data1.items[repeat].snippet.thumbnails.medium.url, 
+                      videoid: data1.items[repeat].id.videoId,
+                  channelname: data1.items[repeat].snippet.channelTitle, 
+                    channelid: data1.items[repeat].snippet.channelId,
+                     duration: parseDuration(data2[size].contentDetails.duration),  
+                    viewcount: data2[repeat].statistics.viewCount ? numberWithCommas(data2[repeat].statistics.viewCount) : 0
+                })
+
+                repeat++
             }
-                return output.send(feed)
+                return output.send(outputJSON)
         })
     })
 })
 
-/* Returns a String of recent videos from an associated Channel ID */
-server.get('/channel', function(input, output)
-{
-    input = input.query
-    
-    if (!input.c) 
-        return output.sendStatus(404)
 
-    download("https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=" + input.c + "&order=date&type=video&maxResults=25&key=" + APIKEY, function(data1) 
-    {
-        let result1 = JSON.parse(data1).items
-        
-        TimSort.sort(result1, channelSort)
-        
-        let feed = result1[24].id.videoId, size = 24
-        
-        while (size--) { feed += "," + result1[size].id.videoId }
-        
-        download("https://www.googleapis.com/youtube/v3/videos?id=" + feed + "&key=" + APIKEY + "&part=contentDetails,statistics", function(data2)
-        { 
-            let count = 0
-            
-            feed = ""
-            size = 25
-            
-            data2 = JSON.parse(data2).items
-            
-            while (size--)   
-            {
-               feed +=            result1[count].snippet.title 
-                    + "///:///" + result1[count].snippet.thumbnails.medium.url 
-                    + "///:///" + parseDuration(data2[size].contentDetails.duration) 
-                    + "///:///" + numberWithCommas(data2[size].statistics.viewCount)
-                    + "///:///https://www.youtube.com/watch?v=" + result1[count].id.videoId 
-                    + "///:///" + result1[count].snippet.channelTitle 
-                    + "///:///" + result1[count].snippet.channelId 
-                    + "///:///"
-               
-               count++
-            }
-                return output.send(feed)
-        })
-    })
-})
 
-/* Returns a String with urls associated with a Channel ID's: Official Name and Thumbnail */
-server.get('/chInfo', function(input, output)
+/**
+ * @typedef {Object} ChannelDetail
+ * @property {String} description
+ * @property {String} thumbnail
+ */
+
+/**
+ * Returns 
+ * @params {String} ID
+ * @return {ChannelDetail} 
+ */
+server.get('/channel/detail/:ID', function(input, output)
 {
-    input = input.query
-    
-    if (!input.c)
-        return output.sendStatus(404)
-    
-    download("https://www.googleapis.com/youtube/v3/channels?part=snippet&id=" + input.c + "&key=" + APIKEY, function(data) 
+    download(ChannelAPIQuery + input.params.ID, function(data) 
     {
         data = JSON.parse(data).items[0].snippet
         
-        return output.send(data.title + "///:///" + data.thumbnails.medium.url)
+        if (data) {
+            return output.send({description: data.description, thumbnail: data.thumbnails.medium.url})
+        }
+        
+        return output.send({})
     })
 })
 
-/* Default Homepage */
-server.get('*', function (q, s) 
-{
-    s.render('index')
-})
+//---------------------------------------------------------------------------------
 
-/** Utility Functions */
+server.get('*', function(q, s) { s.render('index') }) // Default Homepage
 
-/* Download function */
+//---------------------------------------------------------------------------------
+
 function download(url, callback) {
     https.get(url, function (res) {
-        let data = "";
+        var data = ''
         res.on('data', function (chunk) {
-            data += chunk;
-        });
-        res.on("end", function () {
-            callback(data);
-        });
-    }).on("error", function () {
-        callback(null);
-    });
+            data += chunk
+        })
+        res.on('end', function () {
+            callback(data)
+        })
+    }).on('error', function () {
+        callback(null)
+    })
 }
 
-/* Sorting based on time */
-function nowSort(a, b) { return a.time < b.time ? -1 : a.time > b.time ? 1 : 0 }
+function nowSort(a, b) { return a.time > b.time ? -1 : a.time < b.time ? 1 : 0 }
 
-/* Sorting based on time published */
 function channelSort(a, b) { return a.snippet.publishedAt > b.snippet.publishedAt ? -1 : a.snippet.publishedAt < b.snippet.publishedAt ? 1 : 0 }
 
-/* Regular Expression to formalize number string with appropriate commas */
 const numCommaRegEx = /\B(?=(\d{3})+(?!\d))/g
-function numberWithCommas(x) { return x.toString().replace(numCommaRegEx, ",") }
+function numberWithCommas(x) { return x.toString().replace(numCommaRegEx, ',') }
 
-/* Regular Expression to formalize ISO 8601 string into H:M:S */
-function parseDuration(e){var n=e.replace(/D|H|M/g,":").replace(/P|T|S/g,"").split(":");if(1==n.length)2!=n[0].length&&(n[0]="0"+n[0]),n[0]="0:"+n[0];else for(var l=1,r=n.length-1;r>=l;l++)2!=n[l].length&&(n[l]="0"+n[l],2!=n[l].length&&(n[l]="0"+n[l]));return n.join(":")}
+function parseDuration(e){var n=e.replace(/D|H|M/g,':').replace(/P|T|S/g,'').split(':');if(1==n.length)2!=n[0].length&&(n[0]='0'+n[0]),n[0]='0:'+n[0];else for(var l=1,r=n.length-1;r>=l;l++)2!=n[l].length&&(n[l]='0'+n[l],2!=n[l].length&&(n[l]='0'+n[l]));return n.join(':')}
 
-server.listen(process.env.PORT || '8000')
+server.listen(process.env.PORT || '2000')
+
+//---------------------------------------------------------------------------------

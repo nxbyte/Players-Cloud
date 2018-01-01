@@ -1,6 +1,6 @@
-![image](https://github.com/nextseto/ytn-cloud/blob/master/assets/header-ytn-cloud.png)
+![image](https://github.com/nextseto/ytn-cloud/blob/master/assets/banner.png)
 
-**ytn-cloud** is a nodeJS backend to access and parse youtube video metadata. This works well with the iOS front-end called Players (ytn-iOS repository)
+**Players-Cloud** is a nodeJS backend to access and parse youtube video metadata. This works well with the iOS front-end called Players-iOS
 
 ## Purpose
 
@@ -12,19 +12,7 @@ I was just so fed up with other apps that I took it to myself to make something 
 
 #### Development Requirements
 
-I made a list of things I wanted in the application:
-
-##### Front-End: iOS Application called "Players"
-
-- Swift: Apple's latest programming language
-
-- UICollectionView: This type of view paradigm is ideal to show the metadata for a given video
-
-- iPhone / iPad Support: Be able to support all iOS devices. Must support most screen sizes
-
-- Easily interface to the backend: Simple GET requests and body parameters for backend communication
-
-##### Back-End: nodeJS web application and REST service called "ytn-cloud"
+I made a list of things I wanted in this REST API:
 
 - nodeJS: A simple lightweight server environment to quickly get up and running
 
@@ -38,13 +26,9 @@ I made a list of things I wanted in the application:
 
 #### Roadmap
 
-Now, I wrote this in 2014 and I've been slowly working on it to improve its performance and reliability on both the front/back-end side. With the front-end, I had to update the source to conform to the changes to the Swift language. With the back-end, I had to try different package and javascript techniques to shave milliseconds off the processing/response time.
+I initally I wrote this in 2014 and I've been slowly working on it to improve its performance and reliability on both the front/back-end side. With the front-end, I had to update the source to conform to the changes to the Swift language. With the back-end, I had to try different package and javascript techniques to shave milliseconds off the processing/response time.
 
-#### :)
-
-It's been a long road, but 1.x is finally done. I'm proud of what is currently on GitHub.
-
-Thank you to everyone who has helped me and this project along the way. (Friends, family, reddit testers!!)
+I then updated the REST API to use default REST API conventions and be able to support JSON responses.
 
 ## Setup
 
@@ -53,7 +37,7 @@ Thank you to everyone who has helped me and this project along the way. (Friends
 Download the source and in the source folder type the following in the terminal:
 
 ```
-node CORE.js
+YOUTUBE_API_KEY=<Insert Youtube API Key Here> node CORE.js
 ```
 
 ##### Option 2: Heroku
@@ -62,8 +46,8 @@ node CORE.js
 
 ## Note
 
-This branch of ytn-cloud (v1.2) will work with v1.1 and v1.2 iOS application. **There are no guarantees that future front ends will be backwards compatiable with this version of the backend.**
+REST APIs in Version 2 will not work with v1.x iOS application.
 
 ## License
 
-All source code in ytn-cloud is released under the MIT license. See LICENSE for details.
+All source code in Players-Cloud is released under the MIT license. See LICENSE for details.
