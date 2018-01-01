@@ -338,7 +338,7 @@ server.get('/channel/detail/:ID', function(input, output)
 
 //---------------------------------------------------------------------------------
 
-server.get('*', function(q, s) { s.render('index') }) // Default Homepage
+server.get('*', function(q, s) { s.redirect('https://github.com/nextseto/Players-Cloud') })
 
 //---------------------------------------------------------------------------------
 

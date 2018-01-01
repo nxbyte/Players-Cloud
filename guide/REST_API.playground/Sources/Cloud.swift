@@ -1,45 +1,38 @@
 
-/* Warren Seto ~ Cloud ~ Players App (v2) */
-
 import Foundation
 
-/*  */
 public struct VideoEntry :Decodable {
-    let result    :VideoResult,
-        detail    :VideoDetail
+    let result           :VideoResult,
+        detail           :VideoDetail
 }
 
-/*  */
 public struct VideoResult  :Decodable {
-    let title       :String,
-        thumbnail   :URL,
-        videoid     :String,
-        channelname :String,
-        channelid   :String,
-        duration    :String,
-        viewcount   :String
+    let title              :String,
+        thumbnail          :URL,
+        videoid            :String,
+        channelname        :String,
+        channelid          :String,
+        duration           :String,
+        viewcount          :String
 }
 
-/*  */
 public struct VideoDetail  :Decodable {
-    let description :String?,
-        mp4         :URL?,
-        like        :String?,
-        dislike     :String?
+    let description        :String?,
+        mp4                :URL?,
+        like               :String?,
+        dislike            :String?
 }
 
 public struct ChannelDetail:Decodable {
-    let description :String,
-        thumbnail   :URL?
+    let description        :String,
+        thumbnail          :URL?
 }
 
-/*  */
 public struct SearchResult :Decodable {
-    let nextToken   :String,
-        results     :[VideoResult]
+    let nextToken          :String,
+        results            :[VideoResult]
 }
 
-/*  */
 public struct SearchQuery : CustomStringConvertible {
     
     public var query = "",

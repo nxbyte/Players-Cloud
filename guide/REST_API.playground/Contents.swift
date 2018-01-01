@@ -1,7 +1,7 @@
-//: # REST API Guide for Cloud Server
-//: ## Test between the Players iOS client with the Players_Cloud server
+//: # REST API Guide for the Players-Cloud Server
+//: ## An interactive way of playing with the Players-Cloud server REST APIs
 
-import UIKit
+import Foundation
 import PlaygroundSupport
 
 // Playground Setup : Run all async functions

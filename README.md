@@ -34,19 +34,39 @@ I then updated the REST API to use default REST API conventions and be able to s
 
 ##### Option 1: Local Server
 
-Download the source and in the source folder type the following in the terminal:
+1. Download the source: `git clone https://github.com/nextseto/Players-Cloud`
 
-```
-YOUTUBE_API_KEY=<Insert Youtube API Key Here> node CORE.js
-```
+2. Get the packages needed to run the app: `npm install`
+
+3. Go into the folder: `cd Players-Cloud`
+
+4. Run the app: `YOUTUBE_API_KEY=<Insert Youtube API Key Here> node CORE.js`
 
 ##### Option 2: Heroku
 
 [![Deploy](https://www.herokucdn.com/deploy/button.png)](https://heroku.com/deploy)
 
+## REST API
+
+##### All APIs return JSON Strings with specific objects per API
+
+`/channel/:ID` - Get the most recent videos for a given array of channel IDs (seperated by commas)
+
+`/video/detail/:ID/:format` - Get some details for a given youtube video ID
+
+`/video/:ID/:format` - Get all the details for a given youtube video ID
+
+`/search/:query/:nextToken/:options` - Get a list of videos for a given query, page token, and filter option 
+
+`/channel/detail/:ID` - Get channel metadata for a given channel ID
+
+`Everything else` - Redirects to this GitHub page
+
+**Note**: Look into the playgrounds file in the repository to have a more interactive way of experimenting with the REST APIs
+
 ## Note
 
-REST APIs in Version 2 will not work with v1.x iOS application.
+REST APIs in Version 2 are not compatiable with the v1.x iOS application.
 
 ## License
 
