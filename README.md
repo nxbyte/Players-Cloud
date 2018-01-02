@@ -1,6 +1,8 @@
 ![image](https://github.com/nextseto/ytn-cloud/blob/master/assets/banner.png)
 
-**Players-Cloud** is a nodeJS backend to access and parse youtube video metadata. This works well with the iOS front-end called Players-iOS
+[![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/nextseto/Players-Cloud/master/LICENSE)
+
+**Players-Cloud** is a nodeJS backend to access and parse youtube video metadata. This works in conjunction with the iOS front-end called Players-iOS (specifically 2.x).
 
 ## Purpose
 
@@ -14,19 +16,19 @@ I was just so fed up with other apps that I took it to myself to make something 
 
 I made a list of things I wanted in this REST API:
 
-- nodeJS: A simple lightweight server environment to quickly get up and running
+- [nodeJS 9+](https://nodejs.org/en/): A simple lightweight server environment to quickly get up and running
 
-- express: To build some webpages and the REST API part of the service
+- [express](https://expressjs.com): To build some webpages and the REST API part of the service
 
-- async: Performance win using Async.each(...)
+- [async](https://caolan.github.io/async/): Performance win for .each(...) & .parallel(...)
 
-- timsort: Performance win using a battle-tested fast sorting algorithm
+- [timsort](https://github.com/mziccard/node-timsort): Performance win using a battle-tested fast sorting algorithm
 
-- node-ytdl: An abstraction over Youtube to access metadata for YouTube information
+- [node-ytdl-core](https://github.com/fent/node-ytdl-core): An abstraction over Youtube to access metadata for YouTube information
 
 #### Roadmap
 
-I initally I wrote this in 2014 and I've been slowly working on it to improve its performance and reliability on both the front/back-end side. With the front-end, I had to update the source to conform to the changes to the Swift language. With the back-end, I had to try different package and javascript techniques to shave milliseconds off the processing/response time.
+I initially I wrote this in 2014 and I've been slowly working on it to improve its performance and reliability on both the front/back-end side. With the front-end, I had to update the source to conform to the changes to the Swift language. With the back-end, I had to try different package and javascript techniques to shave milliseconds off the processing/response time.
 
 I then updated the REST API to use default REST API conventions and be able to support JSON responses.
 
@@ -50,7 +52,7 @@ I then updated the REST API to use default REST API conventions and be able to s
 
 ##### All APIs return JSON Strings with specific objects per API
 
-`/channel/:ID` - Get the most recent videos for a given array of channel IDs (seperated by commas)
+`/channel/:ID` - Get the most recent videos for a given array of channel IDs (separated by commas)
 
 `/video/detail/:ID/:format` - Get some details for a given youtube video ID
 
@@ -62,11 +64,7 @@ I then updated the REST API to use default REST API conventions and be able to s
 
 `Everything else` - Redirects to this GitHub page
 
-**Note**: Look into the playgrounds file in the repository to have a more interactive way of experimenting with the REST APIs
-
-## Note
-
-REST APIs in Version 2 are not compatiable with the v1.x iOS application.
+**Note**: Look into the playgrounds file in the repository to have a more interactive way of experimenting with the REST APIs. Alternately, CORE.js contains JSDoc documentation for the response and return requests payloads.
 
 ## License
 
