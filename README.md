@@ -1,4 +1,4 @@
-![image](https://github.com/nextseto/ytn-cloud/blob/master/assets/banner.png)
+![image](https://github.com/nextseto/Players-Cloud/blob/master/assets/banner.png)
 
 [![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/nextseto/Players-Cloud/master/LICENSE)
 
@@ -64,7 +64,13 @@ I then updated the REST API to use default REST API conventions and be able to s
 
 `Everything else` - Redirects to this GitHub page
 
-**Note**: Look into the playgrounds file in the repository to have a more interactive way of experimenting with the REST APIs. Alternately, CORE.js contains JSDoc documentation for the response and return requests payloads.
+**To learn more about the API**...
+
+- Look into the playgrounds file in the repository to have a more interactive way of experimenting with the REST APIs. 
+
+- Look at the __examples__ folder for sample json responses.
+
+- Alternately, CORE.js contains JSDoc documentation for the response and return requests payloads for each endpoint.
 
 ## License
 
