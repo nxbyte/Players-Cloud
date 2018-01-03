@@ -28,9 +28,9 @@ I made a list of things I wanted in this REST API:
 
 #### Roadmap
 
-I initially I wrote this in 2014 and I've been slowly working on it to improve its performance and reliability on both the front/back-end side. With the front-end, I had to update the source to conform to the changes to the Swift language. With the back-end, I had to try different package and javascript techniques to shave milliseconds off the processing/response time.
+I initially wrote this in 2014 and I've been slowly working on it to improve its performance and reliability on both the front/back-end side. With the front-end, I had to update the source to conform to the changes to the Swift language. With the back-end, I had to try different package and javascript techniques to shave milliseconds off the processing/response time.
 
-I then updated the REST API to use default REST API conventions and be able to support JSON responses.
+In 2017, the cloud service was updated with a REST API that conforms to REST API conventions and supports JSON responses.
 
 ## Setup
 
