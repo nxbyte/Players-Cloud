@@ -6,14 +6,14 @@
     "author": "iOS Developer",
     "dependencies": {
         "async": "^2.6.0",
-        "compression": "^1.7.1",
+        "compression": "^1.7.2",
         "ejs": "^2.5.7",
         "express": "^4.16.2",
         "timsort": "^0.3.0",
-        "ytdl-core": ">=0.20.1"
+        "ytdl-core": ">=0.20.2"
     },
     "engines": {
-        "node": ">=9.4.0"
+        "node": ">=9.6.1"
     },
     "license": "MIT"
 }
