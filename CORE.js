@@ -234,7 +234,7 @@ server.get('/video/:ID/:format', function(input, output)
                               channelname:data1.snippet.channelTitle, 
                               channelid:data1.snippet.channelId, 
                               duration: parseDuration(data1.contentDetails.duration), 
-                              viewcount: data1.statistics.viewCount ? numberWithCommas(data1.statistics.viewCount) : "0"
+                              viewcount: data1.statistics ? numberWithCommas(data1.statistics.viewCount) : "0"
                              }
                     })
                 } else {
@@ -299,7 +299,7 @@ server.get('/search/:query/:nextToken/:options', function(input, output)
                   channelname: data1.items[repeat].snippet.channelTitle, 
                     channelid: data1.items[repeat].snippet.channelId,
                      duration: parseDuration(data2[size].contentDetails.duration),  
-                    viewcount: data2[repeat].statistics.viewCount ? numberWithCommas(data2[repeat].statistics.viewCount) : 0
+                    viewcount: data2[repeat].statistics ? numberWithCommas(data2[repeat].statistics.viewCount) : "0"
                 })
 
                 repeat++
