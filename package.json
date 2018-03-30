@@ -10,7 +10,7 @@
         "ejs": "^2.5.8",
         "express": "^4.16.3",
         "timsort": "^0.3.0",
-        "ytdl-core": ">=0.20.3"
+        "ytdl-core": ">=0.20.2"
     },
     "engines": {
         "node": ">=9.10.1"
