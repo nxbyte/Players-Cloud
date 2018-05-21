@@ -8,15 +8,15 @@
 
 #### Introduction
 
-I love watching videos in my spare time. Whether its watching TV shows on my TiVo or online via Youtube/Twitch. When I first got my iPod Touch in 2009, I religiously used the built in Youtube app to watch Gaming Let's Plays and other content. When Apple removed the Youtube app in iOS 6, I tried to find alternatives, however, as time went on these apps got bloated and I eventually got frustrated. I spent more time closing the built in popup ads and "Rate me!" dialogues than actually enjoying the purpose of the app, watching my favorite youtube channels.
+I love watching videos in my spare time. Whether its watching TV shows on my TiVo or online via Youtube/Twitch. When I got my iPod Touch in 2009, I religiously used the built in Youtube app to watch Gaming Let's Plays and other content. When Apple removed the Youtube app in iOS 6, I tried to find alternatives, however, as time went on these Youtube-app-alternatives got bloated and I eventually got frustrated. I spent more time closing the built in popup ads and "Rate me!" dialogues than actually enjoying the purpose of the app; watching my favorite youtube channels.
 
-I was just so fed up with other apps that I took it to myself to make something to satisfy my hunger of watching great content on Youtube.
+I was just so fed up with other apps that I took it upon myself to make something to satisfy my hunger of watching great content on Youtube.
 
 #### Development Requirements
 
 I made a list of things I wanted in this REST API:
 
-- [nodeJS 9+](https://nodejs.org/en/): A simple lightweight server environment to quickly get up and running
+- [nodeJS 10+](https://nodejs.org/en/): A simple lightweight server environment to quickly get up and running
 
 - [express](https://expressjs.com): To build some webpages and the REST API part of the service
 
@@ -28,7 +28,7 @@ I made a list of things I wanted in this REST API:
 
 #### Roadmap
 
-I initially wrote this in 2014 and I've been slowly working on it to improve its performance and reliability on both the front/back-end side. With the front-end, I had to update the source to conform to the changes to the Swift language. With the back-end, I had to try different package and javascript techniques to shave milliseconds off the processing/response time.
+I started working on this in 2014 and I've been slowly working on it to improve its performance and reliability on both the front/back-end. With the front-end, I had to update the source to conform to the changes to the Swift language. With the back-end, I had to try different packages and Javascript techniques to shave milliseconds off the processing/response time.
 
 In 2017, the cloud service was updated with a REST API that conforms to REST API conventions and supports JSON responses.
 

@@ -61,7 +61,7 @@ public final class Cloud
     /** Returns an array of recent videos from an array of Channel ID Strings */
     public class func get(subscriptions:[String], results callback: @escaping ([VideoResult]) -> Void) {
         
-        self._GET("https://custom_backend.com/channel/\(subscriptions.joined(separator: ","))") { (code, data) in
+        self._GET("https://ytn.herokuapp.com/channel/\(subscriptions.joined(separator: ","))") { (code, data) in
             if code == 200 {
                 do {
                     return callback(try JSONDecoder().decode([VideoResult].self, from: data!))
@@ -77,7 +77,7 @@ public final class Cloud
     /** Return only the full description and MP4 from a given video ID String */
     public class func get (video ID:String, withQuality quality:String, details callback: @escaping (VideoDetail?) -> Void) {
         
-        self._GET("https://custom_backend.com/video/detail/\(ID)/\(quality)") { (code, data) in
+        self._GET("https://ytn.herokuapp.com/video/detail/\(ID)/\(quality)") { (code, data) in
             if code == 200 {
                 do {
                     return callback(try JSONDecoder().decode(VideoDetail.self, from: data!))
@@ -93,7 +93,7 @@ public final class Cloud
     /** Return the full video information including name, view count, etc and MP4 from a given video ID String */
     public class func get (video ID:String, withQuality quality:String, entry callback: @escaping (VideoEntry?) -> Void) {
         
-        self._GET("https://custom_backend.com/video/\(ID)/\(quality)") { (code, data) in
+        self._GET("https://ytn.herokuapp.com/video/\(ID)/\(quality)") { (code, data) in
             if code == 200 {
                 do {
                     return callback(try JSONDecoder().decode(VideoEntry.self, from: data!))
@@ -109,7 +109,7 @@ public final class Cloud
     /** Returns an array of videos from a given Search Query */
     public class func get (search payload:SearchQuery, results callback:@escaping (SearchResult?)->()) {
         
-        self._GET("https://custom_backend.com/search/\(payload)") { (code, data) in
+        self._GET("https://ytn.herokuapp.com/search/\(payload)") { (code, data) in
             if code == 200 {
                 do {
                     return callback(try JSONDecoder().decode(SearchResult.self, from: data!))
@@ -125,7 +125,7 @@ public final class Cloud
     /** Return only the description, subscriber count, and thumbnail from a given Channel ID String */
     public class func get (channel ID:String, details callback:@escaping (ChannelDetail?)->()) {
         
-        self._GET("https://custom_backend.com/channel/detail/\(ID)") { (code, data) in
+        self._GET("https://ytn.herokuapp.com/channel/detail/\(ID)") { (code, data) in
             if code == 200 {
                 do {
                     return callback(try JSONDecoder().decode(ChannelDetail.self, from: data!))
