@@ -5,12 +5,11 @@
     "main": "CORE.js",
     "author": "iOS Developer",
     "dependencies": {
-        "async": "^2.6.0",
+        "async": "^2.6.1",
         "compression": "^1.7.2",
-        "ejs": "^2.5.8",
         "express": "^4.16.3",
         "timsort": "^0.3.0",
-        "ytdl-core": ">=0.20.2"
+        "ytdl-core": ">=0.20.4"
     },
     "engines": {
         "node": ">=10.1.0"

@@ -4,8 +4,6 @@
 // Setup Server Rules
 const server = require('express')()
 server.use(require('compression')())
-server.set('view engine', 'ejs')
-server.set('views', __dirname + '/html')
 
 // Setup HTTP client
 const https = require('https')
