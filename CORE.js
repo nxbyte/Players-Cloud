@@ -83,6 +83,8 @@ server.get('/channel/:ID', function(input, output)
     {
         TimSort.sort(feed, nowSort)
         
+        if (feed.length == 0) { return output.send([]); }
+        
         var size = feed.length
 
         if (size > 30)
